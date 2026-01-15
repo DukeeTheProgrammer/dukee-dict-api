@@ -4,6 +4,10 @@ from .models import Profile
 from django.http import JsonResponse
 from django.views import View 
 from django.contrib.auth.hashers import check_password
+from .tools import(
+        api_key,
+        generate_token,
+        )
 
 
 
@@ -36,15 +40,21 @@ class Signup(View):
                 }, "from":"DukeeTheProgrammer"
                                  })
         #creates new user if the checked email not found
-
+        api = api_key()
         new_user = User.objects.create_user(
-                fullname=fullname,
+                username=api,
+                first_name=fullname,
                 email=email,
                 password=password
                 )
         new_user.save()
+
+        tok = generate_token()
         new_profile=Profile.objects.create(
-                user=new_user
+                user=new_user,
+                api_enabled=True,
+                api_key=api,
+                token=tok
                 )
         new_profile.save()
 

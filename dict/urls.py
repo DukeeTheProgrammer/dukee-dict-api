@@ -9,5 +9,6 @@ app_name = "dict"
 
 urlpatterns = [
         path("api/search/<str:word>/", GetWord, name="getword"),
-        path("dasboard/", DashBoard, name="dashboard"),
+        path("dashboard/", DashBoard, name="dashboard"),
+        
         ]
