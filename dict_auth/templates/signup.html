@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Classy Auth</title>
+    <link rel="stylesheet" href="{% static 'css/general.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join our exclusive community</p>
+            </div>
+            
+            <div id="message" class="message"></div>
+            
+            <form id="signupForm" class="auth-form">
+                <!-- CSRF Token -->
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Create a strong password" required>
+                    <button type="button" class="password-toggle" id="togglePassword">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm your password" required>
+                </div>
+                
+                <button type="submit" class="btn" id="signupBtn">
+                    <span id="btnText">Create Account</span>
+                    <i class="fas fa-spinner fa-spin" id="btnSpinner" style="display: none;"></i>
+                </button>
+            </form>
+            
+            <div class="auth-link">
+                <p>Already have an account? <a href="{% url 'dict_auth:login' %}">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const signupForm = document.getElementById('signupForm');
+        const messageDiv = document.getElementById('message');
+        const signupBtn = document.getElementById('signupBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+
+        // Form submission handler
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData(signupForm);
+
+            // Show loading state
+            btnText.textContent = 'Creating Account...';
+            btnSpinner.style.display = 'inline-block';
+            signupBtn.disabled = true;
+
+            // Get CSRF token (if using Django)
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]');
+            
+            // Send data to server
+            fetch('/signup/', {
+                method: 'POST',
+                headers: csrfToken ? {
+                    'X-CSRF-Token': csrfToken.value
+                } : {},
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.status && result.status.success) {
+                    showMessage('Account created successfully! Redirecting...', 'success');
+                    
+                    // Reset form
+                    signupForm.reset();
+                    
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showMessage(result.status?.message || 'Signup failed. Please try again.', 'error');
+                    resetButton();
+                }
+            })
+            .catch(error => {
+                console.error('Signup error:', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+                resetButton();
+            });
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+
+            // Auto-hide error messages after 5 seconds
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function resetButton() {
+            btnText.textContent = 'Create Account';
+            btnSpinner.style.display = 'none';
+            signupBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
