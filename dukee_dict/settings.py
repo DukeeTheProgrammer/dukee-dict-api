@@ -125,7 +125,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CSRF_TRUSTED_ORIGINS = [
-        "https://*.trycloudflare.com"
+        "https://*.trycloudflare.com",
+        "https://*.up.railway.app"
         ]
 
 CORS_ALLOW_ALL_ORIGINS = True
