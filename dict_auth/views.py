@@ -1,14 +1,20 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, Log
 from django.http import JsonResponse
 from django.views import View 
 from django.contrib.auth.hashers import check_password
+from django.utils import timezone
+import random, string
+
 from .tools import(
         api_key,
         generate_token,
         )
-
+from django.contrib.auth import (
+        login,
+        logout,
+        )
 
 
 class Signup(View):
@@ -41,8 +47,10 @@ class Signup(View):
                                  })
         #creates new user if the checked email not found
         api = api_key()
+        aplh=string.ascii_letters
+        username = random.sample(aplh, k=10)
         new_user = User.objects.create_user(
-                username=api,
+                username=username,
                 first_name=fullname,
                 email=email,
                 password=password
@@ -56,7 +64,13 @@ class Signup(View):
                 api_key=api,
                 token=tok
                 )
+        ip_addr = request.META.get("REMOTE_ADDR")
         new_profile.save()
+        new_log = Log.objects.create(
+                user=new_profile,
+                ip=ip_addr
+                )
+        new_log.save()
 
         return JsonResponse({
                 "status": {
@@ -89,6 +103,7 @@ class Login(View):
 
             if check_password(password, user.password):
                 user.logged_in = True
+                login(request, user)
                 user.save()
                 return JsonResponse({
                     "status":{
@@ -122,11 +137,48 @@ class WelcomePage(View):
         return render(request, "welcome.html")
 
     def post(self, request):
-        pass
+        return render(request, "error.html", {
+            "error_code":400,
+            "error_title":"Wrong Method Sent To this Server",
+            "message":"You have sent A Post request to this server but it is not accepted",
+            "timestamp":timezone.now
+            })
 
 
 class GetDictWord(View):
     def get(self, request):
         return render(request, "dashboard.html")
     def post(self, request):
-        pass
+        return render(request, "error.html", {
+            "error_code":400,
+            "error_title":"Wrong Method Sent To this Server",
+            "message":"You have sent A Post request to this server but it is not accepted",
+            "timestamp":timezone.now
+            })
+
+
+
+
+class Logout(View):
+    def get(self,request):
+        user = request.user
+        try:
+            if request.session:
+                request.session.flush()
+                return render(request, "login.html")
+            return render(request, 'login.html')
+        except Exception as e:
+            return render(request, "error.html", {
+                "error_code":500,
+                "message": f"Could not Log you out. This Could Happen if your session has expired. You can try logging in again to resolve the issue.",
+                "error_title": "Logout Misdirection",
+                "timestamp" :timezone.now}
+                          )
+    def post(self, request):
+        
+        return render(request, "error.html", {
+            "error_code":500,
+            "error_title":"Wrong Method Sent To this Server",
+            "message":"You have sent A Post request to this server but it is not accepted",
+            "timestamp":timezone.now
+            })

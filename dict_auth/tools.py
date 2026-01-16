@@ -6,7 +6,7 @@ import string
 def generate_token():
     letters = string.ascii_letters
 
-    shortened = letters[:30]
+    shortened = [random.choice(letters) for _ in range(30)]
 
     stringed = "".join(shortened)
 
@@ -15,4 +15,4 @@ def generate_token():
 
 
 def api_key():
-    return generate_token()+"dict-api"
+    return "dd_api_"+generate_token()
