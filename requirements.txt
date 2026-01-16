@@ -28,9 +28,6 @@ Jinja2==3.1.6
 joblib==1.5.3
 MarkupSafe==3.0.3
 nltk==3.9.2
-numpy @ file:///home/builder/.termux-build/python-numpy/src/dist/numpy-2.2.5-cp312-cp312-linux_aarch64.whl#sha256=5bd061eb5e1323ce3e3f3e293dd720cbdff3a5b3ac066b0fcc963cb32949730d
-opencv-contrib-python @ file:///home/builder/.termux-build/python-opencv-python/src
-opencv-python @ file:///home/builder/.termux-build/python-opencv-python/src
 packaging==25.0
 pillow==12.0.0
 pipx==1.8.0
