@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-        GetWord,
+        SearchWord,
         DashBoard,
         api,
         token,
@@ -10,9 +10,9 @@ from .views import (
 app_name = "dict"
 
 urlpatterns = [
-        path("api/search/<str:word>/", GetWord, name="getword"),
+        path("api/search/<str:word>/", SearchWord.as_view(), name="search"),
         path("dashboard/", DashBoard, name="dashboard"),
-        path("api/", api, name="api"),
-        path("token/", token, name="token"),
+        path("api/dasboard/", api, name="api"),
+        path("token/dashboard/", token, name="token"),
         
         ]

@@ -4,7 +4,6 @@ from .models import Profile, Log
 from django.http import JsonResponse
 from django.views import View 
 from django.contrib.auth.hashers import check_password
-from django.utils import timezone
 import random, string
 
 from .tools import(
@@ -137,48 +136,16 @@ class WelcomePage(View):
         return render(request, "welcome.html")
 
     def post(self, request):
-        return render(request, "error.html", {
-            "error_code":400,
-            "error_title":"Wrong Method Sent To this Server",
-            "message":"You have sent A Post request to this server but it is not accepted",
-            "timestamp":timezone.now
-            })
-
-
-class GetDictWord(View):
-    def get(self, request):
-        return render(request, "dashboard.html")
-    def post(self, request):
-        return render(request, "error.html", {
-            "error_code":400,
-            "error_title":"Wrong Method Sent To this Server",
-            "message":"You have sent A Post request to this server but it is not accepted",
-            "timestamp":timezone.now
-            })
-
-
+        pass
 
 
 class Logout(View):
-    def get(self,request):
-        user = request.user
+    def get(self, request):
         try:
-            if request.session:
-                request.session.flush()
-                return render(request, "login.html")
-            return render(request, 'login.html')
+            request.session.flush()
+            return render(request, "login.html")
         except Exception as e:
-            return render(request, "error.html", {
-                "error_code":500,
-                "message": f"Could not Log you out. This Could Happen if your session has expired. You can try logging in again to resolve the issue.",
-                "error_title": "Logout Misdirection",
-                "timestamp" :timezone.now}
-                          )
+            return render(request, "login.html")
+
     def post(self, request):
-        
-        return render(request, "error.html", {
-            "error_code":500,
-            "error_title":"Wrong Method Sent To this Server",
-            "message":"You have sent A Post request to this server but it is not accepted",
-            "timestamp":timezone.now
-            })
+        return render(request, "login.html")

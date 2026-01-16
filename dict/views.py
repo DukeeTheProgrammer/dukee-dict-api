@@ -1,6 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 import random
+from .dict_tools import get_word
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
+from dict_auth.models import Profile
+from django.http import JsonResponse
 
 
 
@@ -58,3 +65,59 @@ def token(request):
         return render(request,"token.html", {"token":token})
     except Exception as e:
         return render(request, "token.html", {"token":"Token Generation Failed"})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SearchWord(View):
+    def get(self, request, word):
+        auth = request.headers.get("X-Authorization")
+        token = request.headers.get("X-token")
+
+
+        pro = Profile.objects.filter(token=token,api_key=auth).first()
+        user = pro.user if pro else "Anonymous"
+
+
+        if not pro:
+            return JsonResponse({
+                "error":True,
+                "success":False,
+                "message":"No user seems to be Authenticated Due to invalid Token or auth. Please verify your headers"
+                })
+        else:
+            if not user and not pro.api_key:
+                return JsonResponse({
+                    "error":True,
+                    "success":False,
+                    "message":"Authentication Failed, Please make sure your sending the right API key wih your request headers"
+                    })
+            elif not pro.token:
+                return JsonResponse({
+                    "error":True,
+                    "success":False,
+                    "message":"Token is invalid For this request. Go to your dashboard and make sure your using the right token"
+                    })
+
+            else:
+                if not word:
+                    return JsonResponse({
+                        "error":True,
+                        "success":False,
+                        "message":"Make sure your word parameter is not empty"
+                        })
+                else:
+                    request.session["word"] = word
+                    result = get_word(word)
+
+                    return JsonResponse({
+                        "error":False,
+                        "success":True,
+                        "message":result,
+                        "info":"Please Read user guide for more info"
+                        })
+
+    def post(self, request, word):
+        return JsonResponse({
+            "error":True,
+            "success":False,
+            "message":"POST is not yet avaiable for this endpoint."
+            })
