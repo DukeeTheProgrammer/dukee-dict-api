@@ -129,3 +129,5 @@ CSRF_TRUSTED_ORIGINS = [
         ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
