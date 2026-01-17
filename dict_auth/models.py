@@ -17,4 +17,4 @@ class Log(models.Model):
     ip = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
-        return str(self.user.first_name)
+        return str(self.profile.user.first_name)
