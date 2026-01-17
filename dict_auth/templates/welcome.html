@@ -571,11 +571,13 @@
                         <span class="code-comment">// JavaScript example using fetch</span><br><br>
                         <span class="code-keyword">const</span> <span class="code-function">fetchDefinition</span> = <span class="code-keyword">async</span> (word) => {<br>
                         &nbsp;&nbsp;<span class="code-keyword">const</span> apiKey = <span class="code-string">'YOUR_API_KEY'</span>;<br>
-                        &nbsp;&nbsp;<span class="code-keyword">const</span> url = <span class="code-string">`https://api.dukee-dict.com/v1/word/${word}`</span>;<br><br>
+                        &nbsp;&nbsp;<span class="code-keyword">const</span> url = <span class="code-string">`/api/search/${word}`</span>;<br><br>
                         &nbsp;&nbsp;<span class="code-keyword">try</span> {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(url, {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;headers: {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Authorization'</span>: <span class="code-string">`Bearer ${apiKey}`</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Authorization'</span>: <span class="code-string">`${apiKey}`</span>,<br>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Token'</span>: <span class="code-string">`YOUR_TOKEN_HERE`</span>,<br>
+                        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span><br>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;});<br><br>
@@ -583,7 +585,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">throw new</span> <span class="code-function">Error</span>(<span class="code-string">'Word not found'</span>);<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> data = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">console</span>.<span class="code-function">log</span>(data);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">console</span>.<span class="code-function">log</span>(data.message);<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> data;<br>
                         &nbsp;&nbsp;} <span class="code-keyword">catch</span> (error) {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">console</span>.<span class="code-function">error</span>(<span class="code-string">'Error fetching word:'</span>, error);<br>
