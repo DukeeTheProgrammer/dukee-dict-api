@@ -768,24 +768,28 @@
                 <div class="instructions">
                     <h3>How to Use Your Access Token</h3>
                     <p style="color: var(--text-light); margin-bottom: 20px;">
-                        Include your JWT token in the Authorization header of your API requests:
+                        Include your token in the Authorization header of your API requests:
                     </p>
                     
                     <div class="code-block">
                         <code>
                             <span class="code-comment">// JavaScript Fetch API Example</span><br>
-                            <span class="code-keyword">const</span> token = <span class="code-string">'YOUR_JWT_TOKEN_HERE'</span>;<br>
+                            <span class="code-keyword">const</span> token = <span class="code-string">'YOUR_TOKEN_HERE'</span>;<br>
+                             <span class="code-keyword">const</span> api_key = <span class="code-string">'YOUR_API_HERE'</span>;<br>
+                            
                             <span class="code-keyword">const</span> word = <span class="code-string">'serendipity'</span>;<br><br>
                             
-                            <span class="code-function">fetch</span>(<span class="code-string">`https://api.dukee-dict.com/v1/word/${word}`</span>, {<br>
+                            <span class="code-function">fetch</span>(<span class="code-string">`/api/search/${word}`</span>, {<br>
                             &nbsp;&nbsp;method: <span class="code-string">'GET'</span>,<br>
                             &nbsp;&nbsp;headers: {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Authorization'</span>: <span class="code-string">`Bearer ${token}`</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Authorization'</span>: <span class="code-string">`${token}`</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Token'</span>: <span class="code-string">`${api_key}`</span>,<br>
+                            
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span><br>
                             &nbsp;&nbsp;}<br>
                             })<br>
                             .then(response => response.<span class="code-function">json</span>())<br>
-                            .then(data => <span class="code-function">console</span>.<span class="code-function">log</span>(data))<br>
+                            .then(data => <span class="code-function">console</span>.<span class="code-function">log</span>(data.message))<br>
                             .catch(error => <span class="code-function">console</span>.<span class="code-function">error</span>(<span class="code-string">'Error:'</span>, error));
                         </code>
                     </div>
@@ -798,10 +802,8 @@
                         <ul class="usage-list">
                             <li><i class="fas fa-shield-alt"></i> Never commit tokens to version control</li>
                             <li><i class="fas fa-lock"></i> Store tokens in environment variables</li>
-                            <li><i class="fas fa-sync"></i> Refresh tokens before they expire</li>
                             <li><i class="fas fa-eye-slash"></i> Never share tokens publicly</li>
-                            <li><i class="fas fa-history"></i> Monitor token usage regularly</li>
-                            <li><i class="fas fa-ban"></i> Revoke compromised tokens immediately</li>
+                            <li><i class="fas fa-history"></i> Monitor token/Api usage regularly</li>
                         </ul>
                     </div>
                 </div>

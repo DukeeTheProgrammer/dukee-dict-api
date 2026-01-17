@@ -7,7 +7,7 @@
     <title>Sign In | Classy Auth</title>
     <link rel="stylesheet" href="{% static 'css/general.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
 </head>
 <body>
     <div class="container">
@@ -103,7 +103,7 @@
                     showMessage(`Login successful! Redirecting...`, 'success');
                     // Redirect to dashboard after 2 seconds
                     setTimeout(() => {
-                        window.location.href = '/dashboard';
+                        window.location.href = "{% url 'dict:dashboard' %}";
                     }, 2000);
                 } else {
                     showMessage(result.status?.message || 'Login failed. Please check your credentials.', 'error');

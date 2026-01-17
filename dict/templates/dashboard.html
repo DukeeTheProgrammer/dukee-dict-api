@@ -739,7 +739,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'dict:analytics' %}" class="nav-link">
                     <i class="fas fa-chart-bar nav-icon"></i>
                     <span>Analytics</span>
                 </a>
@@ -803,7 +803,9 @@
                         <i class="fas fa-exchange-alt"></i>
                     </div>
                 </div>
-                <div class="stat-value">{% if requests %} {{ requests }} {% else %} Could not fetch, try reloading page {% endif %}</div>
+                <div class="stat-value">
+                    {{ requests_made }}
+                </div>
                 <div class="stat-label">This Month</div>
                 <div class="stat-change change-positive">
                     <i class="fas fa-arrow-up"></i>
@@ -866,14 +868,10 @@
             
             <div class="console-controls">
                 <select class="console-select" id="apiEndpoint">
-                    <option value="/v1/word">GET /v1/word/{word}</option>
-                    <option value="/v1/synonyms">GET /v1/synonyms/{word}</option>
-                    <option value="/v1/antonyms">GET /v1/antonyms/{word}</option>
-                    <option value="/v1/pronunciation">GET /v1/pronunciation/{word}</option>
-                    <option value="/v1/translate">POST /v1/translate</option>
+                    <option value="/api/search//">GET /api/search/{word}</option>
                 </select>
                 
-                <input type="text" class="console-input" id="apiInput" placeholder="Enter word or JSON payload" value="serendipity">
+                <input type="text" class="console-input" id="apiInput" placeholder="Enter word or JSON payload">
                 
                 <div class="console-actions">
                     <button class="btn btn-primary" id="sendRequest">
@@ -899,7 +897,7 @@
                     <i class="fas fa-key"></i>
                     API Keys Management
                 </h2>
-                <a class="btn btn-primary" href='/api/'>
+                <a class="btn btn-primary" href='{% url 'dict:api' %}'>
                     <i class="fas fa-plus"></i>
                     Generate New Key
                 </a>
@@ -919,9 +917,9 @@
                 <tbody>
                     <tr>
                         <td>Production App</td>
-                        <td><code class="key-value">dd_api_5f8k3m9p2q7r1t6v</code></td>
-                        <td>Mar 15, 2023</td>
-                        <td>84,235 requests</td>
+                        <td><code class="key-value">{{ api_key }}</code></td>
+                        <td>{{ date }}</td>
+                        <td>{{ requests_made }} requests</td>
                         <td><span class="key-status status-active">Active</span></td>
                         <td>
                             <div class="key-actions">
@@ -937,135 +935,10 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Development</td>
-                        <td><code class="key-value">dd_api_9w2x4y6z8a1b3c5d</code></td>
-                        <td>Apr 2, 2023</td>
-                        <td>12,457 requests</td>
-                        <td><span class="key-status status-active">Active</span></td>
-                        <td>
-                            <div class="key-actions">
-                                <button class="btn-icon" title="Copy">
-                                    <i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn-icon" title="Regenerate">
-                                    <i class="fas fa-redo"></i>
-                                </button>
-                                <button class="btn-icon" title="Revoke">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Mobile App</td>
-                        <td><code class="key-value">dd_api_7e9g2i4k6m8o0q2s</code></td>
-                        <td>May 10, 2023</td>
-                        <td>28,124 requests</td>
-                        <td><span class="key-status status-active">Active</span></td>
-                        <td>
-                            <div class="key-actions">
-                                <button class="btn-icon" title="Copy">
-                                    <i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn-icon" title="Regenerate">
-                                    <i class="fas fa-redo"></i>
-                                </button>
-                                <button class="btn-icon" title="Revoke">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Testing</td>
-                        <td><code class="key-value">dd_api_3u5w7y9a1c3e5g7i</code></td>
-                        <td>Jun 5, 2023</td>
-                        <td>452 requests</td>
-                        <td><span class="key-status status-inactive">Inactive</span></td>
-                        <td>
-                            <div class="key-actions">
-                                <button class="btn-icon" title="Copy">
-                                    <i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn-icon" title="Activate">
-                                    <i class="fas fa-power-off"></i>
-                                </button>
-                                <button class="btn-icon" title="Delete">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+               </tbody>
             </table>
         </div>
-
-        <!-- Recent Activity -->
-        <div class="activity-container">
-            <h2 class="section-title">
-                <i class="fas fa-history"></i>
-                Recent Activity
-            </h2>
-            
-            <div class="activity-list">
-                <div class="activity-item">
-                    <div class="activity-icon activity-success">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="activity-details">
-                        <h4>API Key Generated</h4>
-                        <p>New API key created for "Mobile App" project</p>
-                    </div>
-                    <div class="activity-time">10 min ago</div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon activity-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="activity-details">
-                        <h4>Rate Limit Warning</h4>
-                        <p></p>
-                    </div>
-                    <div class="activity-time">2 hours ago</div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon activity-info">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="activity-details">
-                        {% if requests %}
-                        <h4>API Request</h4>
-                        <p>Successful lookup for word "ubiquitous" from IP {{ip}}</p>
-                        {% else %}
-                        {% endif %}
-                    </div>
-                    <div class="activity-time">5 hours ago</div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon activity-error">
-                        <i class="fas fa-times"></i>
-                    </div>
-                    <div class="activity-details">
-                    </div>
-                    <div class="activity-time">1 day ago</div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon activity-success">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="activity-details">
-                    </div>
-                    <div class="activity-time"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
+                           <!-- Footer -->
         <footer class="dashboard-footer">
             <div class="footer-links">
                 <a href="#" class="footer-link">Privacy Policy</a>
@@ -1113,192 +986,151 @@
             </p>
         </footer>
     </main>
+<script>
+    // Menu toggle for mobile
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
 
-    <script>
-        // Menu toggle for mobile
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        
+    if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('active');
         });
-        
-        // API Console functionality
-        const sendRequestBtn = document.getElementById('sendRequest');
-        const clearConsoleBtn = document.getElementById('clearConsole');
-        const apiEndpointSelect = document.getElementById('apiEndpoint');
-        const apiInput = document.getElementById('apiInput');
-        const consoleOutput = document.getElementById('consoleOutput');
-        
-        // Sample API responses
-        const apiResponses = {
-            '/v1/word': {
-                request: 'GET /v1/word/serendipity',
-                response: {
-                    "word": "serendipity",
-                    "phonetic": "/ˌsɛrənˈdɪpɪti/",
-                    "meanings": [
-                        {
-                            "partOfSpeech": "noun",
-                            "definitions": [
-                                {
-                                    "definition": "The occurrence and development of events by chance in a happy or beneficial way.",
-                                    "example": "A fortunate stroke of serendipity led to the discovery."
-                                }
-                            ]
-                        }
-                    ],
-                    "origin": "Coined by Horace Walpole in 1754, from the Persian fairy tale 'The Three Princes of Serendip'.",
-                    "frequency": 4.2
+    }
+
+    // API Console elements
+    const sendRequestBtn = document.getElementById('sendRequest');
+    const clearConsoleBtn = document.getElementById('clearConsole');
+    const apiEndpointSelect = document.getElementById('apiEndpoint');
+    const apiInput = document.getElementById('apiInput');
+    const consoleOutput = document.getElementById('consoleOutput');
+
+    sendRequestBtn.addEventListener('click', async () => {
+        const endpoint = apiEndpointSelect.value;
+        const input = apiInput.value.trim();
+
+        if (!input) {
+            showOutput('Please enter a word or JSON payload', 'error');
+            return;
+        }
+
+        showOutput('Sending request to API...', 'info');
+
+        try {
+            const response = await fetch(`/api/search/${input}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Authorization": "dd_api_YjUmtCxkqOzVvApWeLnKYYvutBYBif",
+                    "X-Token": "XZAXOnFZhkZDrvwWtDHetEYGoOloHW"
                 }
-            },
-            '/v1/synonyms': {
-                request: 'GET /v1/synonyms/serendipity',
-                response: {
-                    "word": "serendipity",
-                    "synonyms": ["chance", "fortuity", "fortune", "luck", "fluke", "happy accident"],
-                    "count": 6
-                }
-            },
-            '/v1/antonyms': {
-                request: 'GET /v1/antonyms/serendipity',
-                response: {
-                    "word": "serendipity",
-                    "antonyms": ["misfortune", "bad luck", "calamity", "design", "plan"],
-                    "count": 5
-                }
-            },
-            '/v1/pronunciation': {
-                request: 'GET /v1/pronunciation/serendipity',
-                response: {
-                    "word": "serendipity",
-                    "phonetic": "/ˌsɛrənˈdɪpɪti/",
-                    "audio": "https://api.dukee-dict.com/audio/serendipity.mp3",
-                    "variants": [
-                        {"dialect": "US", "phonetic": "/ˌsɛrənˈdɪpɪdi/"},
-                        {"dialect": "UK", "phonetic": "/ˌsɛrənˈdɪpɪti/"}
-                    ]
-                }
-            },
-            '/v1/translate': {
-                request: 'POST /v1/translate',
-                response: {
-                    "source": "serendipity",
-                    "sourceLanguage": "en",
-                    "targetLanguage": "es",
-                    "translation": "serendipia",
-                    "confidence": 0.92
-                }
-            }
-        };
-        
-        sendRequestBtn.addEventListener('click', () => {
-            const endpoint = apiEndpointSelect.value;
-            const input = apiInput.value.trim();
-            
-            if (!input) {
-                showOutput('Please enter a word or JSON payload', 'error');
-                return;
-            }
-            
-            // Show loading
-            showOutput('Sending request to API...', 'info');
-            
-            // Simulate API request delay
-            setTimeout(() => {
-                const response = apiResponses[endpoint];
-                
-                let output = `
-<div style="color: #60a5fa; margin-bottom: 10px;">
-    <i class="fas fa-paper-plane"></i> ${response.request}
-</div>
-<div style="color: #34d399; margin-bottom: 15px;">
-    <i class="fas fa-check-circle"></i> Response (200 OK)
-</div>
-<pre style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; overflow-x: auto;">
-${JSON.stringify(response.response, null, 2)}
-</pre>
-<div style="color: #94a3b8; margin-top: 15px; font-size: 12px;">
-    <i class="far fa-clock"></i> Response time: 48ms
-</div>
-<hr style="border-color: #334155; margin: 20px 0;">
-`;
-                
-                consoleOutput.innerHTML = output + consoleOutput.innerHTML;
-            }, 800);
-        });
-        
-        clearConsoleBtn.addEventListener('click', () => {
-            consoleOutput.innerHTML = `
-<div style="color: #60a5fa;">// API Console Cleared</div>
-<div style="color: #94a3b8; margin-top: 10px;">Select an endpoint and click "Send Request" to test the API</div>
-`;
-        });
-        
-        function showOutput(message, type) {
-            const colors = {
-                'info': '#60a5fa',
-                'error': '#f87171',
-                'success': '#34d399'
-            };
-            
-            const output = `<div style="color: ${colors[type]}; margin-bottom: 10px;">${message}</div>`;
+            });
+
+            const data = await response.json();
+
+            const output = `
+                <div style="color:#60a5fa; margin-bottom:10px;">
+                    <i class="fas fa-paper-plane"></i>
+                    GET /api/search/${input}
+                </div>
+
+                <div style="color:${response.ok ? '#34d399' : '#f87171'}; margin-bottom:15px;">
+                    <i class="fas fa-check-circle"></i>
+                    Response (${response.status})
+                </div>
+
+                <pre style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; overflow-x:auto;">
+${JSON.stringify(data, null, 2)}
+                </pre>
+
+                <div style="color:#94a3b8; margin-top:15px; font-size:12px;">
+                    <i class="far fa-clock"></i> Response received
+                </div>
+
+                <hr style="border-color:#334155; margin:20px 0;">
+            `;
+
             consoleOutput.innerHTML = output + consoleOutput.innerHTML;
+
+        } catch (error) {
+            showOutput('Request failed: ' + error.message, 'error');
         }
-        
-        // Copy API Key functionality
-        document.querySelectorAll('.btn-icon[title="Copy"]').forEach(button => {
-            button.addEventListener('click', function() {
-                const keyValue = this.closest('tr').querySelector('.key-value').textContent;
-                navigator.clipboard.writeText(keyValue).then(() => {
-                    const originalIcon = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i>';
-                    this.style.color = '#34d399';
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalIcon;
-                        this.style.color = '';
-                    }, 2000);
-                });
+    });
+
+    clearConsoleBtn.addEventListener('click', () => {
+        consoleOutput.innerHTML = `
+            <div style="color:#60a5fa;">// API Console Cleared</div>
+            <div style="color:#94a3b8; margin-top:10px;">
+                Select an endpoint and click "Send Request" to test the API
+            </div>
+        `;
+    });
+
+    function showOutput(message, type) {
+        const colors = {
+            info: '#60a5fa',
+            error: '#f87171',
+            success: '#34d399'
+        };
+
+        const output = `
+            <div style="color:${colors[type]}; margin-bottom:10px;">
+                ${message}
+            </div>
+        `;
+
+        consoleOutput.innerHTML = output + consoleOutput.innerHTML;
+    }
+
+    // Copy API Key functionality
+    document.querySelectorAll('.btn-icon[title="Copy"]').forEach(button => {
+        button.addEventListener('click', function () {
+            const keyValue = this.closest('tr')?.querySelector('.key-value')?.textContent;
+
+            if (!keyValue) return;
+
+            navigator.clipboard.writeText(keyValue).then(() => {
+                const originalIcon = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i>';
+                this.style.color = '#34d399';
+
+                setTimeout(() => {
+                    this.innerHTML = originalIcon;
+                    this.style.color = '';
+                }, 2000);
             });
         });
-        
-        // Update stats periodically
-        function updateStats() {
-            const statValues = document.querySelectorAll('.stat-value');
-            
-            statValues.forEach(stat => {
-                if (stat.textContent.includes(',')) {
-                    const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
-                    const increment = Math.floor(Math.random() * 100);
-                    const newValue = currentValue + increment;
-                    
-                    // Animate the number change
-                    animateValue(stat, currentValue, newValue, 1000);
-                }
-            });
+    });
+
+    // Stats update animation
+    function updateStats() {
+        document.querySelectorAll('.stat-value').forEach(stat => {
+            const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
+            if (isNaN(currentValue)) return;
+
+            const increment = Math.floor(Math.random() * 100);
+            animateValue(stat, currentValue, currentValue + increment, 1000);
+        });
+    }
+
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+
+        function step(timestamp) {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.textContent = Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) requestAnimationFrame(step);
         }
-        
-        function animateValue(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
-                element.textContent = value.toLocaleString();
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-        
-        // Update stats every 30 seconds
-        setInterval(updateStats, 30000);
-        
-        // Initialize
-        console.log('%cDukee-Dict API Dashboard Loaded', 'color: #60a5fa; font-size: 18px; font-weight: bold;');
-        console.log('%cWelcome back, DukeeTheProgrammer!', 'color: #a78bfa;');
-    </script>
+
+        requestAnimationFrame(step);
+    }
+
+    setInterval(updateStats, 30000);
+
+    console.log('%cDukee-Dict API Dashboard Loaded', 'color:#60a5fa; font-size:18px; font-weight:bold;');
+    console.log('%cWelcome back, DukeeTheProgrammer!', 'color:#a78bfa;');
+</script>
+
+
 </body>
 </html>

@@ -12,7 +12,7 @@ class Profile(models.Model):
         return str(self.user.first_name)
 
 class Log(models.Model):
-    user = models.OneToOneField(Profile, on_delete=models.CASCADE, null=True, related_name="logs")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, null=True, related_name="logs")
     requests = models.IntegerField(default=0, blank=True, null=True)
     ip = models.CharField(max_length=100, blank=True, null=True)
     

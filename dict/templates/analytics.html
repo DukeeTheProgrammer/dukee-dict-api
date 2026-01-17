@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | Dukee-Dict API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #60a5fa;
+            --primary-dark: #3b82f6;
+            --secondary: #a78bfa;
+            --accent: #f472b6;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-light: #cbd5e1;
+            --border: #334155;
+            --chart-1: #60a5fa;
+            --chart-2: #a78bfa;
+            --chart-3: #f472b6;
+            --chart-4: #34d399;
+            --chart-5: #fbbf24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a2e 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            padding: 25px 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Analytics Dashboard */
+        .analytics-header {
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Date Range Selector */
+        .date-range-selector {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .date-btn:hover {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .date-btn.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+        }
+
+        .custom-date-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(96, 165, 250, 0.3);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .icon-requests {
+            background-color: rgba(96, 165, 250, 0.2);
+            color: var(--primary);
+        }
+
+        .icon-users {
+            background-color: rgba(168, 85, 247, 0.2);
+            color: var(--secondary);
+        }
+
+        .icon-revenue {
+            background-color: rgba(52, 211, 153, 0.2);
+            color: var(--success);
+        }
+
+        .icon-uptime {
+            background-color: rgba(251, 191, 36, 0.2);
+            color: var(--warning);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--danger);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Data Tables */
+        .data-tables {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(96, 165, 250, 0.05);
+        }
+
+        /* Export Section */
+        .export-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .export-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 50px 0 30px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .contact-info {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .whatsapp-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(37, 211, 102, 0.1);
+            color: #25D366;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-contact:hover {
+            background: rgba(37, 211, 102, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin: 30px 0;
+            text-align: center;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: rgba(96, 165, 250, 0.1);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--text-light);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2.2rem;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-tables {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card, .table-card {
+                padding: 20px;
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+            
+            .export-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">📚</div>
+                    <div class="logo-text">Dukee-Dict API</div>
+                </div>
+                
+                <div class="nav-links">
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="analytics.html" class="nav-link active">Analytics</a>
+                    <a href="api.html" class="nav-link">API Keys</a>
+                    <a href="token.html" class="nav-link">Tokens</a>
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                </div>
+                
+                <div class="user-profile">
+                    <div class="user-avatar">DP</div>
+                    <span style="color: var(--text-light); font-size: 14px;">DukeeTheProgrammer</span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Analytics Dashboard -->
+    <main class="container">
+        <div class="analytics-header">
+            <h1 class="page-title">Analytics Dashboard</h1>
+            <p class="page-subtitle">
+                Monitor your API usage, track performance metrics, and analyze trends in real-time.
+                Data updates every 5 minutes.
+            </p>
+            
+            <!-- Date Range Selector -->
+            <div class="date-range-selector">
+                <button class="date-btn active" data-range="7">Last 7 Days</button>
+                <button class="date-btn" data-range="30">Last 30 Days</button>
+                <button class="date-btn" data-range="90">Last 90 Days</button>
+                <button class="date-btn" data-range="365">Last Year</button>
+                
+                <div class="custom-date-range">
+                    <input type="date" class="date-input" id="startDate" value="{{ start_date|default:'2023-10-01' }}">
+                    <span style="color: var(--text-light);">to</span>
+                    <input type="date" class="date-input" id="endDate" value="{{ end_date|default:'2023-10-26' }}">
+                    <button class="date-btn" id="applyDateRange">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <h3>Total Requests</h3>
+                    <div class="stat-icon icon-requests">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ total_requests|default:"1,248,579" }}</div>
+                <div class="stat-label">API requests this period</div>
+                <div class="stat-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    12.5% increase from previous period
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <h3>Active Users</h3>
+                    <div class="stat-icon icon-users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ active_users|default:"2,847" }}</div>
+                <div class="stat-label">Unique API consumers</div>
+                <div class="stat-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    8.3% increase from previous period
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <h3>Revenue</h3>
+                    <div class="stat-icon icon-revenue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${{ total_revenue|default:"24,857" }}</div>
+                <div class="stat-label">Total revenue this period</div>
+                <div class="stat-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    18.3% increase from previous period
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <h3>API Uptime</h3>
+                    <div class="stat-icon icon-uptime">
+                        <i class="fas fa-server"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ uptime_percentage|default:"99.92" }}%</div>
+                <div class="stat-label">Service availability</div>
+                <div class="stat-change change-positive">
+                    <i class="fas fa-arrow-up"></i>
+                    0.08% improvement
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Requests Chart -->
+            <div class="chart-card fade-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">API Requests Over Time</h3>
+                    <div style="color: var(--text-light); font-size: 14px;">
+                        <i class="fas fa-calendar"></i> Last 30 days
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="requestsChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Response Time Chart -->
+            <div class="chart-card fade-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">Average Response Time</h3>
+                    <div style="color: var(--text-light); font-size: 14px;">
+                        <i class="fas fa-clock"></i> Milliseconds
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="responseTimeChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Endpoint Usage Chart -->
+            <div class="chart-card fade-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">Endpoint Usage Distribution</h3>
+                    <div style="color: var(--text-light); font-size: 14px;">
+                        <i class="fas fa-chart-pie"></i> Percentage
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="endpointChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Geographic Distribution Chart -->
+            <div class="chart-card fade-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">Requests by Region</h3>
+                    <div style="color: var(--text-light); font-size: 14px;">
+                        <i class="fas fa-globe"></i> Top 10 countries
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="geographicChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Tables -->
+        <div class="data-tables">
+            <!-- Top Endpoints Table -->
+            <div class="table-card fade-in">
+                <h3 class="table-title">
+                    <i class="fas fa-list-ol"></i>
+                    Top API Endpoints
+                </h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Requests</th>
+                                <th>Success Rate</th>
+                                <th>Avg Response Time</th>
+                                <th>Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for endpoint in top_endpoints %}
+                            <tr>
+                                <td><code style="color: var(--primary);">GET {{ endpoint.path }}</code></td>
+                                <td>{{ endpoint.requests|default:"245,789" }}</td>
+                                <td><span style="color: var(--success);">{{ endpoint.success_rate|default:"99.2" }}%</span></td>
+                                <td>{{ endpoint.avg_response|default:"42" }}ms</td>
+                                <td>
+                                    <span style="color: var(--success);">
+                                        <i class="fas fa-arrow-up"></i> {{ endpoint.growth|default:"12.5" }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td><code>GET /v1/word/{word}</code></td>
+                                <td>245,789</td>
+                                <td><span style="color: var(--success);">99.2%</span></td>
+                                <td>42ms</td>
+                                <td><span style="color: var(--success);"><i class="fas fa-arrow-up"></i> 12.5%</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>GET /v1/synonyms/{word}</code></td>
+                                <td>187,456</td>
+                                <td><span style="color: var(--success);">99.5%</span></td>
+                                <td>38ms</td>
+                                <td><span style="color: var(--success);"><i class="fas fa-arrow-up"></i> 8.7%</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>GET /v1/antonyms/{word}</code></td>
+                                <td>156,234</td>
+                                <td><span style="color: var(--success);">99.1%</span></td>
+                                <td>45ms</td>
+                                <td><span style="color: var(--success);"><i class="fas fa-arrow-up"></i> 15.2%</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>POST /v1/translate</code></td>
+                                <td>98,765</td>
+                                <td><span style="color: var(--success);">98.7%</span></td>
+                                <td>128ms</td>
+                                <td><span style="color: var(--success);"><i class="fas fa-arrow-up"></i> 23.4%</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>GET /v1/pronunciation/{word}</code></td>
+                                <td>87,432</td>
+                                <td><span style="color: var(--success);">99.8%</span></td>
+                                <td>35ms</td>
+                                <td><span style="color: var(--success);"><i class="fas fa-arrow-up"></i> 5.6%</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Recent Activity Table -->
+            <div class="table-card fade-in">
+                <h3 class="table-title">
+                    <i class="fas fa-history"></i>
+                    Recent API Activity
+                </h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Endpoint</th>
+                                <th>Status</th>
+                                <th>Response Time</th>
+                                <th>Client</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activity %}
+                            <tr>
+                                <td>{{ activity.timestamp|default:"2 min ago" }}</td>
+                                <td><code style="font-size: 12px;">{{ activity.endpoint|default:"GET /v1/word/serendipity" }}</code></td>
+                                <td>
+                                    <span class="status-badge" style="
+                                        padding: 3px 8px;
+                                        border-radius: 12px;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                        background: rgba(52, 211, 153, 0.2);
+                                        color: var(--success);
+                                    ">
+                                        {{ activity.status|default:"200" }}
+                                    </span>
+                                </td>
+                                <td>{{ activity.response_time|default:"45" }}ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">
+                                    {{ activity.client|default:"192.168.1.105" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td>2 min ago</td>
+                                <td><code style="font-size: 12px;">GET /v1/word/serendipity</code></td>
+                                <td><span class="status-badge">200</span></td>
+                                <td>45ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">192.168.1.105</td>
+                            </tr>
+                            <tr>
+                                <td>5 min ago</td>
+                                <td><code style="font-size: 12px;">GET /v1/synonyms/ubiquitous</code></td>
+                                <td><span class="status-badge">200</span></td>
+                                <td>38ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">203.0.113.42</td>
+                            </tr>
+                            <tr>
+                                <td>12 min ago</td>
+                                <td><code style="font-size: 12px;">POST /v1/translate</code></td>
+                                <td><span class="status-badge">429</span></td>
+                                <td>12ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">10.0.0.15</td>
+                            </tr>
+                            <tr>
+                                <td>25 min ago</td>
+                                <td><code style="font-size: 12px;">GET /v1/antonyms/ephemeral</code></td>
+                                <td><span class="status-badge">200</span></td>
+                                <td>52ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">172.16.0.88</td>
+                            </tr>
+                            <tr>
+                                <td>42 min ago</td>
+                                <td><code style="font-size: 12px;">GET /v1/pronunciation/onomatopoeia</code></td>
+                                <td><span class="status-badge">200</span></td>
+                                <td>36ms</td>
+                                <td style="color: var(--text-light); font-size: 12px;">192.168.1.200</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section fade-in">
+            <div class="export-header">
+                <h3 style="font-size: 1.3rem; font-weight: 600; color: var(--text);">
+                    <i class="fas fa-download"></i>
+                    Export Analytics Data
+                </h3>
+                <div style="color: var(--text-light); font-size: 14px;">
+                    Data as of {{ current_date|default:"October 26, 2023" }}
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <button class="export-btn" id="exportCSV">
+                    <i class="fas fa-file-csv"></i>
+                    Export as CSV
+                </button>
+                <button class="export-btn" id="exportJSON">
+                    <i class="fas fa-file-code"></i>
+                    Export as JSON
+                </button>
+                <button class="export-btn" id="exportPDF">
+                    <i class="fas fa-file-pdf"></i>
+                    Export as PDF
+                </button>
+                <button class="export-btn" id="exportExcel">
+                    <i class="fas fa-file-excel"></i>
+                    Export as Excel
+                </button>
+                <button class="export-btn" id="scheduleExport">
+                    <i class="fas fa-calendar-alt"></i>
+                    Schedule Export
+                </button>
+            </div>
+            
+            <div style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                <p style="color: var(--text-light); margin-bottom: 15px;">
+                    <i class="fas fa-info-circle"></i>
+                    Export includes all analytics data for the selected date range. 
+                    Large exports may take a few minutes to prepare.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Dukee-Dict API</h3>
+                    <p class="contact-info">
+                        The intelligent dictionary API for developers. 
+                        Comprehensive word definitions, synonyms, antonyms, 
+                        and translations in a simple RESTful interface.
+                    </p>
+                    <a href="https://wa.me/2358115480497" class="whatsapp-contact" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp Support: +235 81 15 48 04 97
+                    </a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="analytics.html">Analytics</a></li>
+                        <li><a href="api.html">API Keys</a></li>
+                        <li><a href="token.html">Token Management</a></li>
+                        <li><a href="documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'dict_auth:signup' %}">Sign Up</a></li>
+                        <li><a href="{% url 'dict_auth:login' %}">Login</a></li>
+                        <li><a href="{% url 'dict_auth:forgot_password' %}">Forgot Password</a></li>
+                        <li><a href="#">API Status</a></li>
+                        <li><a href="#">Support Center</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p class="contact-info">
+                        <i class="fas fa-envelope"></i> support@dukee-dict.com<br>
+                        <i class="fas fa-phone"></i> +1 (234) 567-890<br>
+                        <i class="fas fa-map-marker-alt"></i> Global API Service
+                    </p>
+                </div>
+            </div>
+            
+            <div class="signature pulse">
+                made with love <i class="fas fa-heart" style="color: #f472b6;"></i> DukeeTheProgrammer
+            </div>
+            
+            <div class="social-links">
+                <a href="https://github.com/DukeeTheProgrammer" target="_blank" class="social-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+                
+                <a href="https://linkedin.com/in/dukeetheprogrammer" target="_blank" class="social-link">
+                    <i class="fab fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                </a>
+                
+                <a href="https://wa.me/2358115480497" target="_blank" class="social-link">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+                
+                <a href="https://t.me/dukeetheprogrammer" target="_blank" class="social-link">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </a>
+                
+                <a href="https://x.com/dukeetheprogrammer" target="_blank" class="social-link">
+                    <i class="fab fa-twitter"></i>
+                    <span>X (Twitter)</span>
+                </a>
+            </div>
+            
+            <p class="copyright">
+                &copy; 2023 Dukee-Dict API. All rights reserved. | 
+                Analytics Dashboard v2.1.3 | 
+                Data refreshed: <span id="lastRefresh">{{ last_refresh|default:"Just now" }}</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('%c📊 Analytics Dashboard Loaded', 'color: #60a5fa; font-size: 18px; font-weight: bold;');
+            
+            // Generate sample data for charts
+            const dates = [];
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            
+            // Requests Chart
+            const requestsCtx = document.getElementById('requestsChart').getContext('2d');
+            const requestsChart = new Chart(requestsCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'API Requests',
+                        data: generateRandomData(30, 80000, 120000),
+                        borderColor: 'var(--chart-1)',
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'var(--text-light)' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-light)' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { 
+                                color: 'var(--text-light)',
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Response Time Chart
+            const responseCtx = document.getElementById('responseTimeChart').getContext('2d');
+            const responseChart = new Chart(responseCtx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: generateRandomData(30, 35, 55),
+                        backgroundColor: 'var(--chart-2)',
+                        borderColor: 'var(--chart-2)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'var(--text-light)' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-light)' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-light)' }
+                        }
+                    }
+                }
+            });
+            
+            // Endpoint Usage Chart
+            const endpointCtx = document.getElementById('endpointChart').getContext('2d');
+            const endpointChart = new Chart(endpointCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Word Lookup', 'Synonyms', 'Antonyms', 'Translation', 'Pronunciation'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            'var(--chart-1)',
+                            'var(--chart-2)',
+                            'var(--chart-3)',
+                            'var(--chart-4)',
+                            'var(--chart-5)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: 'var(--card-bg)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: 'var(--text-light)' }
+                        }
+                    }
+                }
+            });
+            
+            // Geographic Distribution Chart
+            const geoCtx = document.getElementById('geographicChart').getContext('2d');
+            const geoChart = new Chart(geoCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: ['United States', 'United Kingdom', 'Germany', 'Canada', 'France', 'Australia', 'India', 'Japan', 'Brazil', 'Netherlands'],
+                    datasets: [{
+                        label: 'Requests',
+                        data: [35, 15, 12, 8, 7, 6, 5, 4, 3, 2],
+                        backgroundColor: 'var(--chart-1)',
+                        borderColor: 'var(--chart-1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'var(--text-light)' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { 
+                                color: 'var(--text-light)',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-light)' }
+                        }
+                    }
+                }
+            });
+            
+            // Helper function to generate random data
+            function generateRandomData(count, min, max) {
+                const data = [];
+                for (let i = 0; i < count; i++) {
+                    data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+                }
+                return data;
+            }
+            
+            // Date Range Selector
+            const dateButtons = document.querySelectorAll('.date-btn');
+            const applyDateRangeBtn = document.getElementById('applyDateRange');
+            
+            dateButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    dateButtons.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update charts with new data range
+                    const range = this.dataset.range;
+                    updateChartsData(range);
+                });
+            });
+            
+            applyDateRangeBtn.addEventListener('click', function() {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                // Validate dates
+                if (startDate && endDate) {
+                    // Update charts with custom date range
+                    updateChartsWithCustomRange(startDate, endDate);
+                    
+                    // Remove active class from all range buttons
+                    dateButtons.forEach(b => b.classList.remove('active'));
+                }
+            });
+            
+            // Export Buttons
+            document.getElementById('exportCSV').addEventListener('click', function() {
+                exportData('csv');
+            });
+            
+            document.getElementById('exportJSON').addEventListener('click', function() {
+                exportData('json');
+            });
+            
+            document.getElementById('exportPDF').addEventListener('click', function() {
+                exportData('pdf');
+            });
+            
+            document.getElementById('exportExcel').addEventListener('click', function() {
+                exportData('excel');
+            });
+            
+            document.getElementById('scheduleExport').addEventListener('click', function() {
+                scheduleExport();
+            });
+            
+            // Export functions
+            function exportData(format) {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
+                btn.disabled = true;
+                
+                // Simulate export process
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    // Show success notification
+                    showNotification(`Exporting data as ${format.toUpperCase()}...`, 'success');
+                    
+                    // In production, this would trigger a download
+                    console.log(`Exporting analytics data as ${format}`);
+                }, 1500);
+            }
+            
+            function scheduleExport() {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scheduling...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    showNotification('Export scheduled for daily delivery at 8:00 AM', 'success');
+                }, 1500);
+            }
+            
+            function updateChartsData(range) {
+                // In production, this would fetch new data from the server
+                console.log(`Updating charts with ${range} days of data`);
+                
+                // Show loading state
+                showNotification('Loading analytics data...', 'info');
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Update stats with new data
+                    updateStatsWithRange(range);
+                    
+                    showNotification('Analytics data updated successfully', 'success');
+                }, 1000);
+            }
+            
+            function updateChartsWithCustomRange(start, end) {
+                console.log(`Updating charts from ${start} to ${end}`);
+                showNotification(`Loading data from ${start} to ${end}...`, 'info');
+                
+                setTimeout(() => {
+                    updateStatsWithCustomRange(start, end);
+                    showNotification('Custom date range data loaded', 'success');
+                }, 1000);
+            }
+            
+            function updateStatsWithRange(range) {
+                // Simulate updating stats based on range
+                const stats = {
+                    '7': { requests: '245,789', users: '1,847', revenue: '$5,842', uptime: '99.95%' },
+                    '30': { requests: '1,248,579', users: '2,847', revenue: '$24,857', uptime: '99.92%' },
+                    '90': { requests: '3,784,256', users: '4,231', revenue: '$78,415', uptime: '99.89%' },
+                    '365': { requests: '14,256,894', users: '8,745', revenue: '$284,567', uptime: '99.85%' }
+                };
+                
+                const data = stats[range] || stats['30'];
+                
+                // Update stat cards
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.requests;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.users;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.revenue;
+                document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.uptime;
+            }
+            
+            function updateStatsWithCustomRange(start, end) {
+                // Generate random data for custom range
+                const requests = Math.floor(Math.random() * 5000000).toLocaleString();
+                const users = Math.floor(Math.random() * 5000).toLocaleString();
+                const revenue = '$' + Math.floor(Math.random() * 50000).toLocaleString();
+                const uptime = (99 + Math.random()).toFixed(2) + '%';
+                
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = requests;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = users;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = revenue;
+                document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = uptime;
+            }
+            
+            // Notification function
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? 'rgba(52, 211, 153, 0.9)' : 'rgba(96, 165, 250, 0.9)'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    z-index: 1000;
+                    animation: fadeIn 0.3s ease;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Auto-refresh every 5 minutes
+            let refreshCount = 0;
+            setInterval(() => {
+                refreshCount++;
+                const lastRefreshElement = document.getElementById('lastRefresh');
+                lastRefreshElement.textContent = refreshCount === 1 ? '1 minute ago' : `${refreshCount} minutes ago`;
+                
+                // Update a random stat to show "live" data
+                const statCards = document.querySelectorAll('.stat-card');
+                const randomCard = statCards[Math.floor(Math.random() * statCards.length)];
+                const statValue = randomCard.querySelector('.stat-value');
+                
+                // Animate the update
+                statValue.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    statValue.style.transform = 'scale(1)';
+                }, 300);
+                
+                console.log('Analytics data auto-refreshed');
+            }, 300000); // 5 minutes
+            
+            // Add fadeOut animation for notifications
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeOut {
+                    from { opacity: 1; transform: translateX(0); }
+                    to { opacity: 0; transform: translateX(100px); }
+                }
+                
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Initialize with 30 days data
+            updateStatsWithRange('30');
+        });
+    </script>
+</body>
+</html>

@@ -66,7 +66,7 @@ class Signup(View):
         ip_addr = request.META.get("REMOTE_ADDR")
         new_profile.save()
         new_log = Log.objects.create(
-                user=new_profile,
+                profile=new_profile,
                 ip=ip_addr
                 )
         new_log.save()
@@ -149,3 +149,8 @@ class Logout(View):
 
     def post(self, request):
         return render(request, "login.html")
+
+
+
+class ForgotPassword(View):
+    pass

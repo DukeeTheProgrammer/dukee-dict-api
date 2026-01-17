@@ -4,6 +4,7 @@ from .views import (
         DashBoard,
         api,
         token,
+        analytics_dashboard,
         )
 
 
@@ -14,5 +15,6 @@ urlpatterns = [
         path("dashboard/", DashBoard, name="dashboard"),
         path("api/dasboard/", api, name="api"),
         path("token/dashboard/", token, name="token"),
+        path("analytics/", analytics_dashboard, name="analytics"),
         
         ]

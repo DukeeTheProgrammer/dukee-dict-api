@@ -6,7 +6,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from dict_auth.models import Profile
+from dict_auth.models import Profile, Log
 from django.http import JsonResponse
 
 
@@ -20,19 +20,25 @@ def GetWord(request):
 
 
 def DashBoard(request):
-    if request.method == "GET":
+    if request.method == "GET" or request.method=="POST":
 
         user = request.user
 
-        requests = user.profile.logs.requests
+        log = Log.objects.filter(profile=user.profile).first()
+        requests_made = log.requests
+        api_key = user.profile.api_key
+        print(f"REQUESTS MADE : {requests_made}")
         percent = random.uniform(0,100)
         percent2 = random.uniform(1,100)
         ip = user.profile.logs.ip 
         api_health = random.uniform(80,100)
+        date = user.date_joined
 
         return render(request, "dashboard.html",
                       {
-                          "requests":requests,
+                          "date":date,
+                          "api_key":api_key,
+                          "requests_made":requests_made,
                           "percent":percent,
                           "percent2":percent2,
                           "ip":ip,
@@ -75,6 +81,12 @@ class SearchWord(View):
 
         pro = Profile.objects.filter(token=token,api_key=auth).first()
         user = pro.user if pro else "Anonymous"
+        try:
+            log = Log.objects.filter(profile=pro).first()
+            log.requests +=1 
+            log.save()
+        except Exception as e:
+            print(f"Could not Save Log : {e}")
 
 
         if not pro:
@@ -121,3 +133,31 @@ class SearchWord(View):
             "success":False,
             "message":"POST is not yet avaiable for this endpoint."
             })
+
+
+
+from django.shortcuts import render
+from datetime import datetime, timedelta
+import json
+
+def analytics_dashboard(request):
+    context = {
+        'total_requests': 1248579,
+        'active_users': 2847,
+        'total_revenue': 24857,
+        'uptime_percentage': 99.92,
+        'start_date': '2023-10-01',
+        'end_date': '2023-10-26',
+        'current_date': datetime.now().strftime('%B %d, %Y'),
+        'last_refresh': 'Just now',
+        'top_endpoints': [
+            {'path': '/v1/word/{word}', 'requests': 245789, 'success_rate': 99.2, 'avg_response': 42, 'growth': 12.5},
+            {'path': '/v1/synonyms/{word}', 'requests': 187456, 'success_rate': 99.5, 'avg_response': 38, 'growth': 8.7},
+            # ... more endpoints
+        ],
+        'recent_activity': [
+            {'timestamp': '2 min ago', 'endpoint': 'GET /v1/word/serendipity', 'status': 200, 'response_time': 45, 'client': '192.168.1.105'},
+            # ... more activity
+        ]
+    }
+    return render(request, 'analytics.html', context)

@@ -541,15 +541,17 @@
                             <span class="code-keyword">const</span> apiKey = <span class="code-string">'YOUR_API_KEY_HERE'</span>;<br>
                             <span class="code-keyword">const</span> word = <span class="code-string">'serendipity'</span>;<br><br>
                             
-                            <span class="code-function">fetch</span>(<span class="code-string">`https://api.dukee-dict.com/v1/word/${word}`</span>, {<br>
+                            <span class="code-function">fetch</span>(<span class="code-string">`/api/search/${word}`</span>, {<br>
                             &nbsp;&nbsp;method: <span class="code-string">'GET'</span>,<br>
                             &nbsp;&nbsp;headers: {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Authorization'</span>: <span class="code-string">`Bearer ${apiKey}`</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Authorization'</span>: <span class="code-string">`${apiKey}`</span>,<br>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'X-Token'</span>: <span class="code-string">'YOUR-TOKEN-HERE'</span><br>
+ 
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span><br>
                             &nbsp;&nbsp;}<br>
                             })<br>
                             .then(response => response.<span class="code-function">json</span>())<br>
-                            .then(data => <span class="code-function">console</span>.<span class="code-function">log</span>(data))<br>
+                            .then(data => <span class="code-function">console</span>.<span class="code-function">log</span>(data.message))<br>
                             .catch(error => <span class="code-function">console</span>.<span class="code-function">error</span>(<span class="code-string">'Error:'</span>, error));
                         </code>
                     </div>
@@ -561,12 +563,14 @@
                             
                             api_key = <span class="code-string">'YOUR_API_KEY_HERE'</span><br>
                             headers = {<br>
-                            &nbsp;&nbsp;<span class="code-string">'Authorization'</span>: <span class="code-string">f'Bearer {api_key}'</span>,<br>
+                            &nbsp;&nbsp;<span class="code-string">'X-Authorization'</span>: <span class="code-string">f'{api_key}'</span>,<br>
+                             &nbsp;&nbsp;<span class="code-string">'X-Token'</span>: <span class="code-string">'YOUR-TOKEN-HERE'</span>,<br>
+                            
                             &nbsp;&nbsp;<span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span><br>
                             }<br><br>
                             
                             response = requests.<span class="code-function">get</span>(<br>
-                            &nbsp;&nbsp;<span class="code-string">'https://api.dukee-dict.com/v1/word/serendipity'</span>,<br>
+                            &nbsp;&nbsp;<span class="code-string">'/api/search/serendipity/'</span>,<br>
                             &nbsp;&nbsp;headers=headers<br>
                             )<br>
                             <span class="code-function">print</span>(response.<span class="code-function">json</span>())
