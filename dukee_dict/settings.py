@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-
+    "dukee_dict.middleware.OptionsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -128,8 +128,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+APPEND_SLASH = True
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_CREDENRIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-        "https://*.up.railway.app"
+        "https://*"
         ]
