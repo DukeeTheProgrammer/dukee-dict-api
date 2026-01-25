@@ -20,7 +20,7 @@ def GetWord(request):
 
 
 def DashBoard(request):
-    if request.method == "GET" or request.method=="POST":
+    if request.method == "GET" or request.method=="POST" or request.method=="OPTIONS":
 
         user = request.user
 

@@ -133,5 +133,25 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_CREDENRIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-        "https://*"
+        "https://*.up.railway.app"
         ]
+
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-csrftoken',
+    'accept',
+    'origin',
+    'user-agent',
+    'cache-control',
+]
